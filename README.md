@@ -120,6 +120,11 @@ Preview), **omitting** `DEV_MEMORY_STORE`:
 | `NEXT_PUBLIC_SUPABASE_URL` | your project URL | public |
 | `SUPABASE_SERVICE_ROLE_KEY` | service_role key | server-only |
 
+For the Gmail bridge (§8b), also add these (all server-only): `GMAIL_IMPORT_SECRET`,
+`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN`, and optionally
+`GMAIL_REPORT_QUERY` / `GMAIL_REPORT_LABEL` (and `CRON_SECRET` if you enable cron). See §8c for how
+to obtain them.
+
 Redeploy after adding/changing env vars.
 
 ---
@@ -166,6 +171,102 @@ ai_cs_updates, important_news, filtered_out, countdowns`.
 See `data/sample-report.json` for a complete, realistic example (including Opportunity metadata
 `{ label: golden|strong|maybe|ignore, cost, location, online, deadline, fitReason, realisticForMe }`
 and Countdown metadata `{ dateTime, daysRemaining, hoursRemaining, whyItMatters, nextStep }`).
+
+---
+
+## 8b) Gmail bridge (PRIMARY automation path)
+
+ChatGPT Scheduled Tasks can't reliably POST to an external API, so the main path is now
+**email-based**. The direct POST (§8) and manual paste (§10) remain as backups.
+
+```
+9:00 AM  ChatGPT task → emails the report to Gmail (JSON wrapped in markers)
+         Gmail filter → applies the "Daily Command Center" label
+later    App reads the latest matching email → extracts JSON → saves to Supabase
+         Dashboard shows it
+```
+
+**The email contract:**
+- **To:** `harshateja.chennu00+dailycommand@gmail.com`
+- **Subject:** `DAILY_COMMAND_CENTER_REPORT YYYY-MM-DD`
+- **Body** contains the report JSON between exact markers:
+  ```
+  ---BEGIN_DAILY_COMMAND_CENTER_JSON---
+  { ...DailyReport JSON... }
+  ---END_DAILY_COMMAND_CENTER_JSON---
+  ```
+
+**How the app reads it** (`lib/gmail-report-importer.ts`, server-only):
+1. Exchanges `GOOGLE_REFRESH_TOKEN` for a short-lived access token (read-only Gmail scope).
+2. Searches Gmail with `GMAIL_REPORT_QUERY` (preferring `GMAIL_REPORT_LABEL` if set) for the newest match.
+3. Pulls the message, extracts the JSON between the markers (tolerates code fences / HTML entities).
+4. Validates with the same `normalizeReport`, then `saveReport` to Supabase — identical to a pushed report.
+
+**Two ways to trigger it:**
+- **Admin button** — `/admin/import` → "Import latest report from Gmail". Uses a **server action**, so no
+  secret reaches the browser.
+- **API route** — `POST /api/import-from-gmail` with `Authorization: Bearer <GMAIL_IMPORT_SECRET>`
+  (for curl/cron).
+- **Cron route** — `GET /api/cron/import-daily-report` (protected by `CRON_SECRET` or `GMAIL_IMPORT_SECRET`).
+  **Not active** until you add a schedule to `vercel.json` (see §8d).
+
+### 8c) Get Gmail OAuth credentials + a refresh token (one-time, ~10 min)
+
+The app needs **read-only** Gmail access via OAuth. Do this once:
+
+1. **Enable the Gmail API:** [Google Cloud Console](https://console.cloud.google.com) → create/select a
+   project → **APIs & Services → Library** → search **Gmail API** → **Enable**.
+2. **OAuth consent screen:** APIs & Services → **OAuth consent screen** → **External** → fill the basics →
+   add your Gmail (`harshateja.chennu00@gmail.com`) as a **Test user** → save. (No verification needed for
+   personal use in "Testing" mode.)
+3. **Create credentials:** APIs & Services → **Credentials** → **Create Credentials → OAuth client ID** →
+   application type **Web application** → add an **Authorized redirect URI**:
+   `https://developers.google.com/oauthplayground` → **Create**. Copy the **Client ID** → `GOOGLE_CLIENT_ID`
+   and **Client secret** → `GOOGLE_CLIENT_SECRET`.
+4. **Get a refresh token** via the [OAuth 2.0 Playground](https://developers.google.com/oauthplayground):
+   - Click the **gear ⚙ (top-right)** → check **"Use your own OAuth credentials"** → paste your Client ID +
+     secret.
+   - Left panel, in **"Input your own scopes"**, enter: `https://www.googleapis.com/auth/gmail.readonly`
+     → **Authorize APIs** → sign in as your Gmail → allow.
+   - Click **"Exchange authorization code for tokens"** → copy the **Refresh token** → `GOOGLE_REFRESH_TOKEN`.
+5. **Make a secret** for the endpoint: `openssl rand -hex 32` → `GMAIL_IMPORT_SECRET`.
+
+Add all of these to `.env.local` (local) and to **Vercel → Settings → Environment Variables** (production).
+None of them are ever exposed to the browser.
+
+### 8d) Enable the cron job later (optional)
+
+When you're ready for it to be fully hands-off, create `vercel.json` at the project root:
+```json
+{
+  "crons": [
+    { "path": "/api/cron/import-daily-report", "schedule": "10 13 * * *" }
+  ]
+}
+```
+Schedules are **UTC**: `10 13 * * *` ≈ **9:10 AM US Eastern (EDT)** — ten minutes after the 9:00 AM task
+sends the email. Set a `CRON_SECRET` env var in Vercel; Vercel sends it automatically as the Bearer token.
+Commit, push, and Vercel registers the cron.
+
+### 8e) Test the Gmail import
+
+**Locally:**
+```bash
+# After adding the Gmail env vars to .env.local and sending a test email:
+export GMAIL_IMPORT_SECRET=...   # same value as in .env.local
+curl -X POST http://localhost:3000/api/import-from-gmail \
+  -H "Authorization: Bearer $GMAIL_IMPORT_SECRET"
+# → { ok:true, id, date, emailSubject, emailDate }
+```
+Or just click **"Import latest report from Gmail"** on `/admin/import`.
+
+**On Vercel:** same curl against `https://test2-t81g.vercel.app/api/import-from-gmail`. Before credentials
+are set it returns `503 { code:"gmail_not_configured" }`; once set and a matching email exists, `200`.
+
+**Confirm the Gmail filter:** Gmail → **Settings (⚙) → See all settings → Filters and Blocked Addresses →
+Create a new filter** → To: `harshateja.chennu00+dailycommand@gmail.com`, Subject:
+`DAILY_COMMAND_CENTER_REPORT` → **Create filter** → check **Apply the label: Daily Command Center** (and
+optionally "Never send to Spam"). The `+dailycommand` plus-address routes to your normal inbox automatically.
 
 ---
 

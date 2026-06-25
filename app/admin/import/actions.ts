@@ -6,12 +6,41 @@ import {
   saveReport,
   StorageNotConfiguredError,
 } from "@/lib/report-store";
+import { importLatestReportFromGmail } from "@/lib/gmail-report-importer";
 
 export interface ImportResult {
   ok: boolean;
   id?: string;
   date?: string;
   error?: string;
+}
+
+export interface GmailImportActionResult extends ImportResult {
+  emailSubject?: string;
+  emailDate?: string;
+}
+
+/**
+ * Server action behind the "Import latest report from Gmail" button.
+ *
+ * Runs the Gmail import server-side and saves via the shared storage layer, so
+ * GMAIL_IMPORT_SECRET and Google credentials never reach the browser. The
+ * secret-protected /api/import-from-gmail route exists separately for cron/curl.
+ *
+ * TODO: add real authentication to this admin page before public exposure.
+ */
+export async function importFromGmailAction(): Promise<GmailImportActionResult> {
+  const result = await importLatestReportFromGmail();
+  if (!result.ok) {
+    return { ok: false, error: result.error };
+  }
+  return {
+    ok: true,
+    id: result.report.id,
+    date: result.report.date,
+    emailSubject: result.emailSubject,
+    emailDate: result.emailDate,
+  };
 }
 
 /**

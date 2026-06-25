@@ -8,13 +8,19 @@ import {
   CheckCircle2,
   FileJson,
   Loader2,
+  Mail,
   Upload,
   XCircle,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { normalizeReport } from "@/lib/validate-report";
 import { getSectionTitle } from "@/lib/sections";
-import { importReportAction, type ImportResult } from "./actions";
+import {
+  importFromGmailAction,
+  importReportAction,
+  type GmailImportActionResult,
+  type ImportResult,
+} from "./actions";
 import sampleReport from "@/data/sample-report.json";
 
 type ParseState =
@@ -32,6 +38,10 @@ export default function ImportPage() {
   const [text, setText] = useState("");
   const [result, setResult] = useState<ImportResult | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [gmailResult, setGmailResult] = useState<GmailImportActionResult | null>(
+    null,
+  );
+  const [isGmailPending, startGmailTransition] = useTransition();
 
   const parse = useMemo<ParseState>(() => {
     if (!text.trim()) return { status: "empty" };
@@ -69,6 +79,14 @@ export default function ImportPage() {
     });
   }
 
+  function handleGmailImport() {
+    setGmailResult(null);
+    startGmailTransition(async () => {
+      const res = await importFromGmailAction();
+      setGmailResult(res);
+    });
+  }
+
   return (
     <div className="min-h-dvh">
       <header className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur-xl pt-safe">
@@ -91,9 +109,9 @@ export default function ImportPage() {
             Manual Import
           </h1>
           <p className="mt-1 text-[14px] leading-relaxed text-muted">
-            Fallback for when ChatGPT can&apos;t POST automatically. Copy the
-            daily report JSON from ChatGPT, paste it below, preview it, and save
-            it. It&apos;s stored exactly like a pushed report.
+            Pull today&apos;s report straight from the Gmail your ChatGPT task
+            sent, or paste the JSON by hand. Either way it&apos;s stored exactly
+            like a pushed report.
           </p>
         </div>
 
@@ -109,13 +127,86 @@ export default function ImportPage() {
           </p>
         </div>
 
+        {/* Primary path: import from Gmail */}
+        <div className="rounded-2xl border border-border bg-surface p-4">
+          <div className="flex items-center gap-2">
+            <Mail className="size-5 text-primary" strokeWidth={1.9} />
+            <h2 className="text-[15px] font-semibold text-foreground">
+              Import from Gmail
+            </h2>
+            <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-semibold text-primary">
+              Primary
+            </span>
+          </div>
+          <p className="mt-1 text-[13px] leading-relaxed text-muted">
+            Reads the latest{" "}
+            <code className="rounded bg-black/[0.06] px-1 py-0.5 text-[12px] dark:bg-white/[0.1]">
+              DAILY_COMMAND_CENTER_REPORT
+            </code>{" "}
+            email and saves it. No copy-paste needed.
+          </p>
+
+          <button
+            type="button"
+            onClick={handleGmailImport}
+            disabled={isGmailPending}
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-[14px] font-semibold text-primary-fg transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isGmailPending ? (
+              <Loader2 className="size-[18px] animate-spin" strokeWidth={2} />
+            ) : (
+              <Mail className="size-[18px]" strokeWidth={2} />
+            )}
+            {isGmailPending ? "Checking Gmail…" : "Import latest report from Gmail"}
+          </button>
+
+          {gmailResult && (
+            <div
+              className={
+                gmailResult.ok
+                  ? "mt-3 flex items-start gap-2.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-[13px] text-foreground"
+                  : "mt-3 flex items-start gap-2.5 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-[13px] text-foreground"
+              }
+            >
+              {gmailResult.ok ? (
+                <CheckCircle2
+                  className="mt-0.5 size-[18px] shrink-0 text-emerald-500"
+                  strokeWidth={2}
+                />
+              ) : (
+                <XCircle
+                  className="mt-0.5 size-[18px] shrink-0 text-red-500"
+                  strokeWidth={2}
+                />
+              )}
+              {gmailResult.ok ? (
+                <span>
+                  Imported{" "}
+                  <span className="font-semibold">{gmailResult.date}</span>
+                  {gmailResult.emailSubject
+                    ? ` from "${gmailResult.emailSubject}"`
+                    : ""}
+                  .{" "}
+                  <Link href="/" className="font-semibold text-primary underline">
+                    Open dashboard →
+                  </Link>
+                </span>
+              ) : (
+                <span>{gmailResult.error}</span>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Fallback path: paste JSON by hand */}
         <div>
           <div className="mb-2 flex items-center justify-between">
             <label
               htmlFor="report-json"
               className="text-[13px] font-medium text-foreground"
             >
-              Report JSON
+              Paste JSON manually
+              <span className="ml-1.5 font-normal text-muted">(fallback)</span>
             </label>
             <div className="flex items-center gap-2 text-[12px]">
               <button
