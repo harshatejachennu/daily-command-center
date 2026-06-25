@@ -206,7 +206,21 @@ function stripHtml(html: string): string {
 }
 
 /**
+ * Repair characters that email clients commonly substitute into pasted JSON:
+ * "smart"/curly quotes, non-breaking spaces, and zero-width characters. These
+ * break JSON.parse even though the content looks correct.
+ */
+function sanitizeJsonText(s: string): string {
+  return s
+    .replace(/[“”„‟″‶]/g, '"') // curly double quotes
+    .replace(/[‘’‚‛′‵]/g, "'") // curly single quotes
+    .replace(/ /g, " ") // non-breaking space
+    .replace(/[​-‍﻿]/g, ""); // zero-width chars / BOM
+}
+
+/**
  * Pull the JSON object out of the text between the BEGIN/END markers.
+ * Tolerates markdown code fences, HTML entities, and smart-quote mangling.
  * Exported for direct unit testing.
  */
 export function extractReportJson(
@@ -222,15 +236,21 @@ export function extractReportJson(
   // Tolerate the JSON being wrapped in a markdown code fence.
   raw = raw.replace(/^```(?:json)?/i, "").replace(/```$/i, "").trim();
 
-  try {
-    return { ok: true, value: JSON.parse(raw) };
-  } catch {
+  // Try progressively more aggressive repairs; return the first that parses.
+  const candidates = [
+    raw,
+    decodeHtmlEntities(raw),
+    sanitizeJsonText(raw),
+    sanitizeJsonText(decodeHtmlEntities(raw)),
+  ];
+  for (const candidate of candidates) {
     try {
-      return { ok: true, value: JSON.parse(decodeHtmlEntities(raw)) };
+      return { ok: true, value: JSON.parse(candidate) };
     } catch {
-      return { ok: false, code: "invalid_json" };
+      // try the next candidate
     }
   }
+  return { ok: false, code: "invalid_json" };
 }
 
 function getHeader(msg: GmailMessage, name: string): string | undefined {
