@@ -1,0 +1,318 @@
+{
+  "id": "2026-06-24-sample",
+  "date": "2026-06-24",
+  "generatedAt": "2026-06-24T09:00:00-04:00",
+  "summary": "Senior-year prep is heating up: lock the JHU APL mentorship application, keep SAT momentum, and reply to two time-sensitive emails.",
+  "sections": [
+    {
+      "id": "top_things",
+      "title": "Top Things I Need To Know Today",
+      "items": [
+        {
+          "id": "top-1",
+          "title": "JHU APL ASPIRE mentorship application is the single highest-leverage thing this week",
+          "body": "Local AI/CS research mentorship that fits your college story almost perfectly. The application window is open now and fills fast.",
+          "priority": "high",
+          "tags": ["research", "AI/CS", "local"]
+        },
+        {
+          "id": "top-2",
+          "title": "Two emails need a reply today",
+          "body": "A counselor email about senior schedule changes and a professor's reply about a possible summer research read-along.",
+          "priority": "high"
+        },
+        {
+          "id": "top-3",
+          "title": "SAT is 9 weeks out — you're on pace if you keep 2 sessions/week",
+          "body": "Math is solid; reading pace is the limiter. Today's focus: one timed reading section.",
+          "priority": "medium",
+          "tags": ["SAT"]
+        }
+      ]
+    },
+    {
+      "id": "needs_attention",
+      "title": "Needs Attention Today / Soon",
+      "items": [
+        {
+          "id": "att-1",
+          "title": "Confirm driving test appointment",
+          "body": "MVA road test is in two weeks. Confirm the slot and make sure logged practice hours are complete.",
+          "priority": "high",
+          "deadline": "2026-07-08"
+        },
+        {
+          "id": "att-2",
+          "title": "Diksuchi session plan due to the team",
+          "body": "You volunteered to lead next week's session — share the outline so others can prep.",
+          "priority": "medium",
+          "deadline": "2026-06-27",
+          "source": "Diksuchi"
+        },
+        {
+          "id": "att-3",
+          "title": "Atmiya Code Club: pick the summer mini-project",
+          "body": "Decide between the beginner Python track and a small web app so you can announce it Friday.",
+          "priority": "low",
+          "deadline": "2026-06-26",
+          "source": "Atmiya Code Club"
+        }
+      ]
+    },
+    {
+      "id": "important_emails",
+      "title": "Important Emails",
+      "items": [
+        {
+          "id": "email-1",
+          "title": "Senior schedule change — action needed",
+          "summary": "Counselor proposes swapping a study hall for AP CS A or Data Science. Reply with your preference by Thursday.",
+          "category": "school/college",
+          "source": "Mount Hebron Counseling",
+          "priority": "high",
+          "deadline": "2026-06-25"
+        },
+        {
+          "id": "email-2",
+          "title": "Re: Summer reading + possible research help",
+          "summary": "A professor replied — open to a short reading project on ML fairness if you can commit ~3 hrs/week.",
+          "category": "internship/professor",
+          "source": "Prof. Reyes (UMD)",
+          "priority": "high"
+        },
+        {
+          "id": "email-3",
+          "title": "Diksuchi volunteer hours confirmation",
+          "summary": "Your logged hours for May were approved; June log is open for entries.",
+          "category": "volunteer/Diksuchi/Atmiya",
+          "source": "Diksuchi Coordinator",
+          "priority": "low"
+        },
+        {
+          "id": "email-4",
+          "title": "Congressional App Challenge registration is open",
+          "summary": "MD District 3 registration opened. Solo or team submissions accepted through the fall.",
+          "category": "applications/opportunities",
+          "source": "Congressional App Challenge",
+          "priority": "medium",
+          "url": "https://www.congressionalappchallenge.us/"
+        }
+      ]
+    },
+    {
+      "id": "opportunities",
+      "title": "Opportunities",
+      "items": [
+        {
+          "id": "opp-1",
+          "title": "JHU APL ASPIRE — High School STEM Mentorship",
+          "category": "Research mentorship",
+          "priority": "high",
+          "url": "https://www.jhuapl.edu/education/aspire",
+          "metadata": {
+            "label": "golden",
+            "cost": "Free",
+            "location": "Laurel, MD (DMV)",
+            "online": false,
+            "deadline": "2026-09-15",
+            "fitReason": "Year-long, local AI/CS research mentorship with a real engineer — exactly the kind of sustained, credible project that strengthens a CS-focused application.",
+            "realisticForMe": true
+          }
+        },
+        {
+          "id": "opp-2",
+          "title": "MIT THINK Scholars Program",
+          "category": "Research / project award",
+          "priority": "medium",
+          "url": "https://think.mit.edu/",
+          "metadata": {
+            "label": "strong",
+            "cost": "Free",
+            "online": true,
+            "deadline": "2027-01-01",
+            "fitReason": "Funds and mentors an original STEM project you propose — pairs well with a CS/AI build you can start this summer.",
+            "realisticForMe": true
+          }
+        },
+        {
+          "id": "opp-3",
+          "title": "Congressional App Challenge — MD District 3",
+          "category": "Coding competition",
+          "priority": "medium",
+          "url": "https://www.congressionalappchallenge.us/",
+          "metadata": {
+            "label": "strong",
+            "cost": "Free",
+            "online": true,
+            "location": "Maryland District 3",
+            "deadline": "2026-11-01",
+            "fitReason": "Local, beginner-friendly, and recognized by a member of Congress — a clean win you can ship solo or with Atmiya Code Club.",
+            "realisticForMe": true
+          }
+        },
+        {
+          "id": "opp-4",
+          "title": "UMD Maryland Summer Hack (high-school track)",
+          "category": "Hackathon",
+          "priority": "low",
+          "metadata": {
+            "label": "maybe",
+            "cost": "Free",
+            "location": "College Park, MD",
+            "online": false,
+            "deadline": "2026-07-20",
+            "fitReason": "Fun and local, but overlaps with SAT prep — only worth it if the weekend stays open.",
+            "realisticForMe": true
+          }
+        },
+        {
+          "id": "opp-5",
+          "title": "Premium AI Career Bootcamp (12 weeks)",
+          "category": "Paid course",
+          "priority": "info",
+          "metadata": {
+            "label": "ignore",
+            "cost": "$3,500",
+            "online": true,
+            "fitReason": "Over the $2,500 cap and offers little a free, project-based path wouldn't. Skip.",
+            "realisticForMe": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "automation_updates",
+      "title": "Scheduled Task / Automation Updates",
+      "items": [
+        {
+          "id": "auto-1",
+          "title": "Daily report delivered successfully",
+          "body": "Today's 9:00 AM report was generated and pushed to your dashboard.",
+          "priority": "info",
+          "source": "ChatGPT Scheduled Task"
+        },
+        {
+          "id": "auto-2",
+          "title": "Reminder: rotate the ingest secret monthly",
+          "body": "Good hygiene for the push endpoint. Update REPORT_INGEST_SECRET in Vercel and your ChatGPT task together.",
+          "priority": "low"
+        }
+      ]
+    },
+    {
+      "id": "weather",
+      "title": "Weather",
+      "items": [
+        {
+          "id": "wx-1",
+          "title": "Partly cloudy",
+          "metadata": {
+            "tempF": 84,
+            "highF": 88,
+            "lowF": 67,
+            "condition": "Partly cloudy",
+            "location": "Ellicott City, MD",
+            "precipChance": 20
+          }
+        }
+      ]
+    },
+    {
+      "id": "ai_cs_updates",
+      "title": "AI / CS Updates",
+      "items": [
+        {
+          "id": "ai-1",
+          "title": "New open-weight small models keep getting better at coding",
+          "summary": "Worth trying one for an offline coding helper on your laptop — a good portfolio note if you benchmark it.",
+          "priority": "info",
+          "tags": ["models", "coding"]
+        },
+        {
+          "id": "ai-2",
+          "title": "Free MIT/Stanford intro-to-ML materials updated for 2026",
+          "summary": "Refreshed notebooks make a solid self-study spine if you take on the THINK project.",
+          "priority": "low",
+          "tags": ["learning"]
+        }
+      ]
+    },
+    {
+      "id": "important_news",
+      "title": "Important News Worth Knowing",
+      "items": [
+        {
+          "id": "news-1",
+          "title": "Maryland expands dual-enrollment options for the coming school year",
+          "summary": "More community-college CS courses may count for high-school credit — ask your counselor if it fits senior year.",
+          "priority": "low",
+          "source": "MD State Education"
+        },
+        {
+          "id": "news-2",
+          "title": "College Board confirms fall SAT dates and registration windows",
+          "summary": "Register early for your preferred local test center before it fills.",
+          "priority": "low",
+          "source": "College Board"
+        }
+      ]
+    },
+    {
+      "id": "filtered_out",
+      "title": "Filtered Out / Nothing Important",
+      "items": [
+        {
+          "id": "filt-1",
+          "title": "Routine newsletters",
+          "body": "3 promotional emails, no action needed."
+        },
+        {
+          "id": "filt-2",
+          "title": "Generic 'win a scholarship' spam",
+          "body": "Low-credibility lead-gen sites, filtered."
+        }
+      ]
+    },
+    {
+      "id": "countdowns",
+      "title": "Countdowns & Upcoming Important Dates",
+      "items": [
+        {
+          "id": "cd-1",
+          "title": "MVA road test",
+          "metadata": {
+            "dateTime": "2026-07-08T10:30:00-04:00",
+            "whyItMatters": "Getting your license frees up time and looks good for independence on applications.",
+            "nextStep": "Confirm the appointment and finish required practice hours."
+          }
+        },
+        {
+          "id": "cd-2",
+          "title": "JHU APL ASPIRE application deadline",
+          "metadata": {
+            "dateTime": "2026-09-15T23:59:00-04:00",
+            "whyItMatters": "Your golden opportunity — missing this closes the door for the year.",
+            "nextStep": "Draft the short essay this week while it's fresh."
+          }
+        },
+        {
+          "id": "cd-3",
+          "title": "First day of senior year",
+          "metadata": {
+            "dateTime": "2026-08-25T07:45:00-04:00",
+            "whyItMatters": "Sets the cadence for applications, courses, and leadership roles."
+          }
+        },
+        {
+          "id": "cd-4",
+          "title": "SAT test date",
+          "metadata": {
+            "dateTime": "2026-08-29T08:00:00-04:00",
+            "whyItMatters": "Primary score for early applications.",
+            "nextStep": "Hold two prep sessions per week; prioritize timed reading."
+          }
+        }
+      ]
+    }
+  ]
+}
