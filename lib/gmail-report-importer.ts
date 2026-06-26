@@ -225,7 +225,9 @@ function sanitizeJsonText(s: string): string {
  */
 export function extractReportJson(
   text: string,
-): { ok: true; value: unknown } | { ok: false; code: "no_markers" | "invalid_json" } {
+):
+  | { ok: true; value: unknown }
+  | { ok: false; code: "no_markers" | "invalid_json"; sample?: string } {
   const start = text.indexOf(BEGIN_MARKER);
   if (start === -1) return { ok: false, code: "no_markers" };
   const from = start + BEGIN_MARKER.length;
@@ -237,11 +239,15 @@ export function extractReportJson(
   raw = raw.replace(/^```(?:json)?/i, "").replace(/```$/i, "").trim();
 
   // Try progressively more aggressive repairs; return the first that parses.
+  // The last candidate collapses newlines to spaces, which rescues JSON that an
+  // email client hard-wrapped (a literal newline inside a string is invalid JSON).
+  const repaired = sanitizeJsonText(decodeHtmlEntities(raw));
   const candidates = [
     raw,
     decodeHtmlEntities(raw),
     sanitizeJsonText(raw),
-    sanitizeJsonText(decodeHtmlEntities(raw)),
+    repaired,
+    repaired.replace(/\r?\n/g, " "),
   ];
   for (const candidate of candidates) {
     try {
@@ -250,7 +256,8 @@ export function extractReportJson(
       // try the next candidate
     }
   }
-  return { ok: false, code: "invalid_json" };
+  // JSON.stringify makes control characters (newlines, etc.) visible for debugging.
+  return { ok: false, code: "invalid_json", sample: JSON.stringify(raw.slice(0, 220)) };
 }
 
 function getHeader(msg: GmailMessage, name: string): string | undefined {
@@ -326,7 +333,7 @@ export async function importLatestReportFromGmail(): Promise<GmailImportResult> 
       error:
         extracted.code === "no_markers"
           ? "Found the email but no JSON between the BEGIN/END markers."
-          : "The text between the markers was not valid JSON.",
+          : `The text between the markers was not valid JSON. Found: ${extracted.sample ?? ""}`,
     };
   }
 
