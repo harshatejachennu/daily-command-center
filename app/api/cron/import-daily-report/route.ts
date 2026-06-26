@@ -5,14 +5,10 @@
 //   9:10 AM  this cron route runs, imports the email, saves to Supabase
 //   dashboard shows the new report automatically
 //
-// It is NOT active until you add a schedule to vercel.json, e.g.:
-//   {
-//     "crons": [
-//       { "path": "/api/cron/import-daily-report", "schedule": "10 13 * * *" }
-//     ]
-//   }
-// (Vercel cron schedules are in UTC — "10 13 * * *" is ~9:10 AM US Eastern in
-// summer / EDT. Adjust for your timezone.)
+// Enabled via vercel.json:
+//   { "crons": [ { "path": "/api/cron/import-daily-report", "schedule": "15 14 * * *" } ] }
+// Schedules are UTC and ignore DST: 14:15 UTC is ~10:15 AM EDT / ~9:15 AM EST —
+// always after the 9:00 AM report email, year-round. See README §8d.
 //
 // Vercel Cron automatically sends `Authorization: Bearer <CRON_SECRET>` when the
 // CRON_SECRET env var is set, so this route is protected by CRON_SECRET (or, for

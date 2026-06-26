@@ -234,19 +234,29 @@ The app needs **read-only** Gmail access via OAuth. Do this once:
 Add all of these to `.env.local` (local) and to **Vercel → Settings → Environment Variables** (production).
 None of them are ever exposed to the browser.
 
-### 8d) Enable the cron job later (optional)
+### 8d) Cron job (fully hands-off import)
 
-When you're ready for it to be fully hands-off, create `vercel.json` at the project root:
+`vercel.json` is included and enables the cron:
 ```json
-{
-  "crons": [
-    { "path": "/api/cron/import-daily-report", "schedule": "10 13 * * *" }
-  ]
-}
+{ "crons": [ { "path": "/api/cron/import-daily-report", "schedule": "15 14 * * *" } ] }
 ```
-Schedules are **UTC**: `10 13 * * *` ≈ **9:10 AM US Eastern (EDT)** — ten minutes after the 9:00 AM task
-sends the email. Set a `CRON_SECRET` env var in Vercel; Vercel sends it automatically as the Bearer token.
-Commit, push, and Vercel registers the cron.
+Schedules are **UTC**, and Vercel cron does **not** follow daylight saving. `15 14 * * *` (14:15 UTC) runs
+~**10:15 AM EDT** in summer and ~**9:15 AM EST** in winter — i.e. always *after* the 9:00 AM report email,
+year-round. (Want it closer to 9 AM in summer? Use `10 13 * * *`, but bump it back for winter or it'll fire
+before the email arrives.) On Vercel's Hobby plan crons run once/day and the exact minute is approximate —
+fine here, since the import just grabs the latest matching email (`newer_than:3d`).
+
+**To turn it on:**
+1. In Vercel → Settings → Environment Variables, add **`CRON_SECRET`** (`openssl rand -hex 32`). Vercel
+   automatically sends it as the Bearer token on cron requests; the route rejects anything else.
+2. **Redeploy** so the new env var and the `vercel.json` schedule both take effect. Vercel registers the
+   cron on deploy (check **Project → Cron Jobs**).
+3. **Test without waiting for tomorrow:** trigger it manually from **Project → Cron Jobs → Run**, or curl it
+   (works with `CRON_SECRET` *or* `GMAIL_IMPORT_SECRET`):
+   ```bash
+   curl https://test2-t81g.vercel.app/api/cron/import-daily-report \
+     -H "Authorization: Bearer $CRON_SECRET"
+   ```
 
 ### 8e) Test the Gmail import
 
