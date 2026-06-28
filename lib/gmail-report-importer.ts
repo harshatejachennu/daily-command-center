@@ -15,6 +15,7 @@ import {
   saveReport,
   StorageNotConfiguredError,
 } from "@/lib/report-store";
+import { sendReportNotification } from "@/lib/notify";
 
 export const BEGIN_MARKER = "---BEGIN_DAILY_COMMAND_CENTER_JSON---";
 export const END_MARKER = "---END_DAILY_COMMAND_CENTER_JSON---";
@@ -355,6 +356,7 @@ export async function importLatestReportFromGmail(): Promise<GmailImportResult> 
 
   try {
     const saved = await saveReport(normalized.report);
+    await sendReportNotification(saved); // best-effort; never throws
     return { ok: true, report: saved, emailSubject, emailDate };
   } catch (err) {
     if (err instanceof StorageNotConfiguredError) {

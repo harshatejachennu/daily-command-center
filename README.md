@@ -278,6 +278,28 @@ Create a new filter** → To: `harshateja.chennu00+dailycommand@gmail.com`, Subj
 `DAILY_COMMAND_CENTER_REPORT` → **Create filter** → check **Apply the label: Daily Command Center** (and
 optionally "Never send to Spam"). The `+dailycommand` plus-address routes to your normal inbox automatically.
 
+### 8f) Phone notifications (ntfy, optional)
+
+After a report is imported (cron or the Gmail button), the app pushes a short summary — the report's
+one-line `summary` plus the top few `top_things` bullets — to an [ntfy](https://ntfy.sh) topic. Skipped
+silently if `NTFY_TOPIC` isn't set.
+
+**Setup (~5 min):**
+1. Install the **ntfy** app ([iOS](https://apps.apple.com/app/ntfy/id1625396347) / Android) or use the web app.
+2. Pick a **long, random topic name** — e.g. `dcc-9f3k2x7q-report` (`openssl rand -hex 6` works). ⚠️ Public
+   ntfy topics are readable by anyone who knows the name, and the summary contains personal info — so make it
+   unguessable. In the app, **Subscribe** to that exact topic.
+3. Add env vars (local `.env.local` and Vercel):
+   ```
+   NTFY_TOPIC=<your-long-random-topic>
+   NEXT_PUBLIC_APP_URL=https://test2-t81g.vercel.app   # optional: tap notification → opens dashboard
+   # NTFY_SERVER=https://ntfy.sh                        # optional: only if self-hosting ntfy
+   ```
+4. Redeploy. Next time a report imports, your phone buzzes with the summary. Test it immediately by clicking
+   **"Import latest report from Gmail"** on `/admin/import` (or triggering the cron).
+
+For a fully private alternative, self-host ntfy or use an authenticated topic and set `NTFY_SERVER`.
+
 ---
 
 ## 9) Test with curl
